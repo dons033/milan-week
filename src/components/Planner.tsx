@@ -209,7 +209,10 @@ export default function Planner({ initialEvents }: Props) {
                   : 'border-stone-300 text-stone-600 hover:bg-white'
               }`}
             >
-              {formatDateShort(g.date)}
+              {formatDateShort(g.date)}{' '}
+              <span className={activeDay === g.date ? 'opacity-60' : 'text-stone-400'}>
+                · {g.items.length}
+              </span>
             </a>
           ))}
         </div>
