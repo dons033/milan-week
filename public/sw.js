@@ -1,10 +1,10 @@
-// Service worker for CalendarApp (Esma). Strategy:
+// Milan Week service worker. Strategy:
 //   - App shell (navigation / Next static assets) : network-first, cache fallback
 //   - Supabase GET /rest/v1/events                : network-first, cache fallback
 //   - OSM tiles                                   : cache-first, size-capped
 //   - Everything else                             : pass through
 
-const VERSION = 'cal-v3';
+const VERSION = 'milanweek-v1';
 const SHELL_CACHE = `${VERSION}-shell`;
 const DATA_CACHE = `${VERSION}-data`;
 const TILE_CACHE = `${VERSION}-tiles`;

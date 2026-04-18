@@ -44,7 +44,7 @@ def geocode(q):
         "https://nominatim.openstreetmap.org/search?"
         + urllib.parse.urlencode({"q": q, "format": "json", "limit": 1, "countrycodes": "it"})
     )
-    req = urllib.request.Request(url, headers={"User-Agent": "CalendarApp-Esma/1.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "MilanWeek-Geocoder/1.0"})
     with urllib.request.urlopen(req, timeout=30) as r:
         data = json.loads(r.read().decode("utf-8"))
     if not data: return None, None
