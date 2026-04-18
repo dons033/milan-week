@@ -67,15 +67,15 @@ SOURCE_HOMEPAGES = [
     ("Designboom", "https://www.designboom.com/"),
     ("Galerie", "https://www.galeriemagazine.com/"),
     ("Dezeen", "https://www.dezeen.com/"),
-    ("Novit\u00e0", "https://novitacomm.com/"),
+    ("Novit\u00e0", "https://novitapr.com/"),
     ("Wallpaper", "https://www.wallpaper.com/"),
     ("Domus", "https://www.domusweb.it/"),
     ("STIR", "https://www.stirworld.com/"),
-    ("Fluxx", "https://www.fluxxmagazine.com/"),
+    ("Fluxx", "https://www.fluxx.it/"),
     ("Fuorisalone.it", "https://www.fuorisalone.it/"),
     ("NSS G-Club", "https://www.nssmag.com/"),
     ("Il Sole 24 Ore", "https://www.ilsole24ore.com/"),
-    ("P:S", "https://www.pitchsomething.com/"),
+    ("P:S", "https://www.patricksisson.com/"),
 ]
 
 def source_url_for(source):
