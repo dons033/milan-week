@@ -15,6 +15,7 @@ import {
   matchesQuery,
 } from '@/lib/format';
 import { loadPicks, setPick as persistPick } from '@/lib/picks';
+import { buildIcs, downloadIcs, slug } from '@/lib/ics';
 
 type Props = { initialEvents: EventRow[] };
 
@@ -102,12 +103,31 @@ export default function Planner({ initialEvents }: Props) {
             {initialEvents.length} events · Milan Design Week 2026
           </p>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap justify-end">
+          {Object.keys(picks).filter((id) => picks[id] === 'going').length > 0 && (
+            <button
+              onClick={() => {
+                const goingIds = Object.keys(picks).filter((id) => picks[id] === 'going');
+                const rows = initialEvents.filter((e) => goingIds.includes(e.id));
+                downloadIcs(buildIcs(rows), 'milan-week-my-picks.ics');
+              }}
+              className="border border-emerald-300 text-emerald-700 bg-emerald-50 rounded-full px-3 py-1.5 text-sm font-medium hover:bg-emerald-100"
+              title="Download your going events as an .ics file"
+            >
+              ⬇ My picks
+            </button>
+          )}
           <Link
             href="/map"
             className="border border-stone-300 rounded-full px-4 py-1.5 text-sm font-medium hover:bg-white"
           >
             Map
+          </Link>
+          <Link
+            href="/about"
+            className="text-stone-500 hover:text-stone-900 text-sm"
+          >
+            About
           </Link>
         </div>
       </header>
@@ -174,6 +194,30 @@ export default function Planner({ initialEvents }: Props) {
           ))}
         </div>
       </nav>
+
+      {(() => {
+        const anyMatch = groups.some((g) =>
+          (!activeDay || g.date === activeDay) &&
+          g.items.some((e) => {
+            if (!matchesQuery(e, query)) return false;
+            if (pickFilter === 'all') return true;
+            if (pickFilter === 'multiday') return !!e.ends_on && e.ends_on !== e.starts_on;
+            return picks[e.id] === pickFilter;
+          }),
+        );
+        if (!anyMatch) {
+          return (
+            <div className="text-sm text-stone-500 py-16 text-center">
+              {query
+                ? `No events match "${query}".`
+                : pickFilter !== 'all'
+                ? `No events marked ${pickFilter}.`
+                : 'No events to show.'}
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       <div className="space-y-12">
         {groups
@@ -337,6 +381,13 @@ function EventCard({
               Directions
             </a>
           )}
+          <button
+            onClick={() => downloadIcs(buildIcs([e]), `${slug(e.title) || 'event'}.ics`)}
+            className="text-stone-500 hover:text-stone-900"
+            title="Add to calendar (.ics)"
+          >
+            + Calendar
+          </button>
           {e.links?.slice(0, 3).map((link, i) => {
             const isFirst = i === 0;
             return (

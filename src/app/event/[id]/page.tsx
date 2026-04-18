@@ -12,6 +12,7 @@ import {
   shortSource,
 } from '@/lib/format';
 import EventPickButtons from '@/components/EventPickButtons';
+import EventIcsButton from '@/components/EventIcsButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,8 +56,38 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
   const isConfirmed = (e.status || '').toUpperCase().includes('CONFIRMED');
   const sourceLabel = shortSource(e.source);
 
+  // schema.org Event JSON-LD for SEO / rich results
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: e.title,
+    startDate: e.starts_on,
+    endDate: e.ends_on || e.starts_on,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    eventStatus: 'https://schema.org/EventScheduled',
+  };
+  if (e.notes) jsonLd.description = e.notes;
+  if (e.host) jsonLd.organizer = { '@type': 'Organization', name: e.host };
+  const placeName = e.venue || e.address || 'Milano';
+  const place: Record<string, unknown> = {
+    '@type': 'Place',
+    name: placeName,
+    address: e.address
+      ? { '@type': 'PostalAddress', streetAddress: e.address, addressLocality: 'Milano', addressCountry: 'IT' }
+      : { '@type': 'PostalAddress', addressLocality: 'Milano', addressCountry: 'IT' },
+  };
+  if (e.lat != null && e.lng != null) {
+    place.geo = { '@type': 'GeoCoordinates', latitude: e.lat, longitude: e.lng };
+  }
+  jsonLd.location = place;
+  if (e.links?.[0]?.url) jsonLd.url = e.links[0].url;
+
   return (
     <main className="max-w-2xl mx-auto px-6 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link href="/" className="inline-block text-sm text-stone-500 hover:text-stone-900 mb-8">
         ← All events
       </Link>
@@ -119,9 +150,12 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           </p>
         )}
 
-        <div className="border-t border-stone-200 pt-5 mb-6">
-          <div className="text-[10px] uppercase tracking-wider text-stone-400 mb-2">Your pick</div>
-          <EventPickButtons eventId={e.id} />
+        <div className="border-t border-stone-200 pt-5 mb-6 flex flex-wrap gap-4 items-center justify-between">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-stone-400 mb-2">Your pick</div>
+            <EventPickButtons eventId={e.id} />
+          </div>
+          <EventIcsButton event={e} />
         </div>
 
         <div className="flex flex-wrap gap-3 text-sm items-center">
