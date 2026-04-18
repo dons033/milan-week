@@ -13,11 +13,45 @@ import {
   directionsUrl,
   shortSource,
   matchesQuery,
+  liveStatus,
 } from '@/lib/format';
 import { loadPicks, setPick as persistPick } from '@/lib/picks';
 import { buildIcs, downloadIcs, slug } from '@/lib/ics';
 
 type Props = { initialEvents: EventRow[] };
+
+type PickFilter = 'all' | 'going' | 'maybe' | 'multiday' | 'today' | 'now';
+
+function passesPickFilter(
+  e: EventRow,
+  dayIso: string,
+  picks: Record<string, Pick>,
+  filter: PickFilter,
+): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'multiday') return !!e.ends_on && e.ends_on !== e.starts_on;
+  if (filter === 'today' || filter === 'now') {
+    // Use today's Milan date for the reference, not the rendered day group
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Rome' });
+    if (dayIso !== today) return false;
+    const status = liveStatus(e);
+    if (status === 'past' || status === 'future' || status === 'unknown') return false;
+    if (filter === 'today') return status === 'open' || status === 'upcoming-today';
+    // 'now': open right now, OR starting within the next hour
+    if (status === 'open') return true;
+    // upcoming-today within 60min: re-parse start time ourselves here
+    const s = (e.starts_time || '').trim();
+    const hh = /^(\d{1,2}):(\d{2})/.exec(s);
+    if (!hh) return false;
+    const startMin = parseInt(hh[1], 10) * 60 + parseInt(hh[2], 10);
+    const now = new Date();
+    const nowMin =
+      parseInt(now.toLocaleString('en-GB', { timeZone: 'Europe/Rome', hour12: false }).slice(11, 13)) * 60 +
+      parseInt(now.toLocaleString('en-GB', { timeZone: 'Europe/Rome', hour12: false }).slice(14, 16));
+    return startMin - nowMin <= 60;
+  }
+  return picks[e.id] === filter;
+}
 
 type DayGroup = { date: string; items: EventRow[] };
 
@@ -42,7 +76,9 @@ function groupByDay(events: EventRow[]): DayGroup[] {
 export default function Planner({ initialEvents }: Props) {
   const [picks, setPicks] = useState<Record<string, Pick>>({});
   const [activeDay, setActiveDay] = useState<string | null>(null);
-  const [pickFilter, setPickFilter] = useState<'all' | 'going' | 'maybe' | 'multiday'>('all');
+  const [pickFilter, setPickFilter] = useState<
+    'all' | 'going' | 'maybe' | 'multiday' | 'today' | 'now'
+  >('all');
   const [query, setQuery] = useState('');
   const didScroll = useRef(false);
 
@@ -179,7 +215,7 @@ export default function Planner({ initialEvents }: Props) {
         </div>
         <div className="flex gap-1.5 items-center text-[10px] uppercase tracking-wider text-stone-400">
           Show:
-          {(['all', 'going', 'maybe', 'multiday'] as const).map((k) => (
+          {(['all', 'now', 'today', 'going', 'maybe', 'multiday'] as const).map((k) => (
             <button
               key={k}
               onClick={() => setPickFilter(k)}
@@ -198,23 +234,20 @@ export default function Planner({ initialEvents }: Props) {
       {(() => {
         const anyMatch = groups.some((g) =>
           (!activeDay || g.date === activeDay) &&
-          g.items.some((e) => {
-            if (!matchesQuery(e, query)) return false;
-            if (pickFilter === 'all') return true;
-            if (pickFilter === 'multiday') return !!e.ends_on && e.ends_on !== e.starts_on;
-            return picks[e.id] === pickFilter;
-          }),
+          g.items.some((e) => passesPickFilter(e, g.date, picks, pickFilter) && matchesQuery(e, query)),
         );
         if (!anyMatch) {
-          return (
-            <div className="text-sm text-stone-500 py-16 text-center">
-              {query
-                ? `No events match "${query}".`
-                : pickFilter !== 'all'
-                ? `No events marked ${pickFilter}.`
-                : 'No events to show.'}
-            </div>
-          );
+          const msg =
+            pickFilter === 'today'
+              ? 'No events still open today.'
+              : pickFilter === 'now'
+              ? 'No events open now or starting within the hour.'
+              : query
+              ? `No events match "${query}".`
+              : pickFilter !== 'all'
+              ? `No events marked ${pickFilter}.`
+              : 'No events to show.';
+          return <div className="text-sm text-stone-500 py-16 text-center">{msg}</div>;
         }
         return null;
       })()}
@@ -225,9 +258,7 @@ export default function Planner({ initialEvents }: Props) {
           .map((g) => {
             const items = g.items.filter((e) => {
               if (!matchesQuery(e, query)) return false;
-              if (pickFilter === 'all') return true;
-              if (pickFilter === 'multiday') return !!e.ends_on && e.ends_on !== e.starts_on;
-              return picks[e.id] === pickFilter;
+              return passesPickFilter(e, g.date, picks, pickFilter);
             });
             if (items.length === 0) return null;
             return (
