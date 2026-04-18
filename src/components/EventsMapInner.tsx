@@ -112,17 +112,24 @@ function EventPopup({ e }: { e: EventRow }) {
           {e.phase}
         </div>
       )}
-      <div style={{ marginTop: 8, display: 'flex', gap: 12, fontSize: 12 }}>
+      <div style={{ marginTop: 8, display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: 12 }}>
         {dir && (
           <a href={dir} target="_blank" rel="noopener noreferrer" style={{ color: '#1c1917', textDecoration: 'underline' }}>
             Directions
           </a>
         )}
-        {e.source_url && (
-          <a href={e.source_url} target="_blank" rel="noopener noreferrer" style={{ color: '#6b7280' }}>
-            Source →
+        {e.links?.slice(0, 3).map((link, i) => (
+          <a
+            key={`${link.url}-${i}`}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: i === 0 ? '#1c1917' : '#6b7280', textDecoration: i === 0 ? 'underline' : 'none' }}
+          >
+            {link.label}
+            {i === 0 ? ' \u2192' : ''}
           </a>
-        )}
+        ))}
       </div>
     </div>
   );

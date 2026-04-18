@@ -124,7 +124,7 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
           <EventPickButtons eventId={e.id} />
         </div>
 
-        <div className="flex flex-wrap gap-4 text-sm">
+        <div className="flex flex-wrap gap-3 text-sm items-center">
           {directions && (
             <a
               href={directions}
@@ -135,17 +135,22 @@ export default async function EventDetail({ params }: { params: Promise<{ id: st
               Directions →
             </a>
           )}
-          {e.source_url && (
+          {e.links?.slice(0, 3).map((link, i) => (
             <a
-              href={e.source_url}
+              key={`${link.url}-${i}`}
+              href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-stone-500 hover:text-stone-900"
-              title={e.source ? `Source: ${e.source}` : 'Source'}
+              className={
+                i === 0
+                  ? 'border border-stone-300 text-stone-800 hover:bg-white rounded-full px-3 py-1 text-sm'
+                  : 'text-stone-500 hover:text-stone-900'
+              }
             >
-              Full listing at {sourceLabel || 'source'} →
+              {link.label}
+              {i === 0 ? ' →' : ''}
             </a>
-          )}
+          ))}
         </div>
       </article>
     </main>

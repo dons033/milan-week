@@ -326,7 +326,7 @@ function EventCard({
           })}
         </div>
 
-        <div className="flex flex-wrap gap-3 mt-2 text-xs items-center">
+        <div className="flex flex-wrap gap-2 mt-2 text-xs items-center">
           {directions && (
             <a
               href={directions}
@@ -337,17 +337,25 @@ function EventCard({
               Directions
             </a>
           )}
-          {e.source_url && (
-            <a
-              href={e.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-stone-500 hover:text-stone-900"
-              title={e.source ? `Source: ${e.source}` : 'Source'}
-            >
-              Source →
-            </a>
-          )}
+          {e.links?.slice(0, 3).map((link, i) => {
+            const isFirst = i === 0;
+            return (
+              <a
+                key={`${link.url}-${i}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={
+                  isFirst
+                    ? 'border border-stone-300 text-stone-700 hover:bg-white rounded-full px-2 py-0.5 text-[11px]'
+                    : 'text-stone-500 hover:text-stone-900 text-[11px]'
+                }
+              >
+                {link.label}
+                {isFirst ? ' \u2192' : ''}
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 export type Pick = 'going' | 'maybe' | 'skip';
 
+export type EventLink = { label: string; url: string };
+
 export type EventRow = {
   id: string;
   starts_on: string;
@@ -14,7 +16,7 @@ export type EventRow = {
   notes: string | null;
   rsvp: string | null;
   source: string | null;
-  source_url: string | null;
+  links: EventLink[];
   status: string | null;
   lat: number | null;
   lng: number | null;

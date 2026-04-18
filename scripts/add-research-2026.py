@@ -30,7 +30,7 @@ EVENTS = [
         "notes": "Biennial kitchen fair with Future Technology for Kitchen.",
         "rsvp": "Trade all week; public 25\u201326 Apr",
         "source": "Official",
-        "source_url": "https://www.salonemilano.it/en",
+        "links": [{"label": "Official", "url": "https://www.salonemilano.it/en"}],
     },
     {
         "title": "International Bathroom Exhibition 2026",
@@ -43,7 +43,7 @@ EVENTS = [
         "notes": "Biennial bathroom fair.",
         "rsvp": "Trade all week; public 25\u201326 Apr",
         "source": "Official",
-        "source_url": "https://www.salonemilano.it/en",
+        "links": [{"label": "Official", "url": "https://www.salonemilano.it/en"}],
     },
     {
         "title": "SaloneSatellite 2026",
@@ -56,7 +56,7 @@ EVENTS = [
         "notes": "Emerging-design showcase and award.",
         "rsvp": "Open to the public at large (fair admission applies)",
         "source": "Official",
-        "source_url": "https://www.salonemilano.it/en",
+        "links": [{"label": "Official", "url": "https://www.salonemilano.it/en"}],
     },
     # ---- District programs ----
     {
@@ -70,7 +70,7 @@ EVENTS = [
         "notes": "District program; selected events require free Fuorisalone Passport.",
         "rsvp": "Mixed by sub-event",
         "source": "Official",
-        "source_url": "https://www.breradesigndistrict.it/en",
+        "links": [{"label": "Official", "url": "https://www.breradesigndistrict.it/en"}],
     },
     {
         "title": "Isola Design Festival 2026",
@@ -83,7 +83,7 @@ EVENTS = [
         "notes": "Independent design festival across the Isola district.",
         "rsvp": "Free",
         "source": "Official",
-        "source_url": "https://isola.design/",
+        "links": [{"label": "Official", "url": "https://isola.design/"}],
     },
     {
         "title": "Porta Venezia Design District 2026",
@@ -96,7 +96,7 @@ EVENTS = [
         "notes": "District program of installations and exhibitions.",
         "rsvp": "Mixed by sub-event",
         "source": "Official",
-        "source_url": "https://www.portaveneziadesigndistrict.com/",
+        "links": [{"label": "Official", "url": "https://www.portaveneziadesigndistrict.com/"}],
     },
     {
         "title": "5VIE Design Week 2026",
@@ -109,7 +109,7 @@ EVENTS = [
         "notes": "Historic-centre district; 5VIE Day on 22 Apr with extended hours.",
         "rsvp": "Mixed by sub-event",
         "source": "Official",
-        "source_url": "https://5vie.it/",
+        "links": [{"label": "Official", "url": "https://5vie.it/"}],
     },
     {
         "title": "Portanuova Design Week 2026",
@@ -122,7 +122,7 @@ EVENTS = [
         "notes": "District route with installations, photo corners and talks.",
         "rsvp": "Mostly free; some activations require app booking",
         "source": "Official",
-        "source_url": "https://www.fuorisalone.it/en/2026",
+        "links": [{"label": "Official", "url": "https://www.fuorisalone.it/en/2026"}],
     },
     {
         "title": "Zona Sarpi Design 2026",
@@ -135,7 +135,7 @@ EVENTS = [
         "notes": "Chinatown territorial platform with installations and co-design.",
         "rsvp": "Mixed by sub-event",
         "source": "Official",
-        "source_url": "https://www.fuorisalone.it/en/2026",
+        "links": [{"label": "Official", "url": "https://www.fuorisalone.it/en/2026"}],
     },
     # ---- Tortona cluster ----
     {
@@ -149,7 +149,7 @@ EVENTS = [
         "notes": "Project platform in the Tortona area.",
         "rsvp": "Mixed by sub-event",
         "source": "Official",
-        "source_url": "https://www.fuorisalone.it/en/2026",
+        "links": [{"label": "Official", "url": "https://www.fuorisalone.it/en/2026"}],
     },
     {
         "title": "Superstudio Design 2026",
@@ -162,7 +162,7 @@ EVENTS = [
         "notes": "Three-venue platform of exhibitions, installations and talks.",
         "rsvp": None,
         "source": "Official",
-        "source_url": "https://www.superstudiogroup.com/",
+        "links": [{"label": "Official", "url": "https://www.superstudiogroup.com/"}],
     },
     # ---- Venue / institution programs ----
     {
@@ -176,7 +176,7 @@ EVENTS = [
         "notes": "Press preview 20 Apr 10:00\u201319:00; 21\u201325 visitors; 26 closes 18:00.",
         "rsvp": "Professionals/press fast-track line",
         "source": "Official",
-        "source_url": "https://www.moscapartners.it/",
+        "links": [{"label": "Official", "url": "https://www.moscapartners.it/"}],
     },
     {
         "title": "DOPIR 2026",
@@ -189,7 +189,7 @@ EVENTS = [
         "notes": "Collective exhibition; designer meet-up 24 Apr 18:30\u201322:30.",
         "rsvp": None,
         "source": "Official",
-        "source_url": "https://www.fuorisalone.it/en/2026",
+        "links": [{"label": "Official", "url": "https://www.fuorisalone.it/en/2026"}],
     },
     {
         "title": "Dropcity 2026 programme",
@@ -202,7 +202,7 @@ EVENTS = [
         "notes": "Research platform in converted Stazione Centrale tunnels.",
         "rsvp": None,
         "source": "Official",
-        "source_url": "https://dropcity.org/",
+        "links": [{"label": "Official", "url": "https://dropcity.org/"}],
     },
     {
         "title": "Triennale Milano \u2014 Milano Design Week 2026",
@@ -215,7 +215,7 @@ EVENTS = [
         "notes": "Umbrella public programme incl. Toyo Ito lecture 20 Apr 11:00.",
         "rsvp": "Mixed; several exhibitions free, others ticketed",
         "source": "Official",
-        "source_url": "https://triennale.org/en",
+        "links": [{"label": "Official", "url": "https://triennale.org/en"}],
     },
     {
         "title": "ADI Design Week 2026",
@@ -228,7 +228,7 @@ EVENTS = [
         "notes": "Exhibitions, installations, talks and award events.",
         "rsvp": "Mixed by programme item",
         "source": "Official",
-        "source_url": "https://www.adidesignmuseum.org/en/",
+        "links": [{"label": "Official", "url": "https://www.adidesignmuseum.org/en/"}],
     },
     {
         "title": "Convey 2026",
@@ -241,7 +241,7 @@ EVENTS = [
         "notes": "Multi-brand exhibition, cultural program and networking.",
         "rsvp": None,
         "source": "Official",
-        "source_url": "https://www.conveydesign.com/",
+        "links": [{"label": "Official", "url": "https://www.conveydesign.com/"}],
     },
     {
         "title": "Milano Kids Design Week 2026",
@@ -254,7 +254,7 @@ EVENTS = [
         "notes": "Family/kids design programme; example workshop 26 Apr 16:00 at Chinese Cultural Center.",
         "rsvp": None,
         "source": "Official",
-        "source_url": "https://www.fuorisalone.it/en/2026",
+        "links": [{"label": "Official", "url": "https://www.fuorisalone.it/en/2026"}],
     },
 ]
 

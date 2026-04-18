@@ -85,6 +85,13 @@ def source_url_for(source):
             return url
     return None
 
+def links_for(source):
+    """One-element links array using the best-known homepage for the source."""
+    url = source_url_for(source)
+    if not url: return []
+    label = (source or "Source").split("/")[0].split("\u00b7")[0].strip() or "Source"
+    return [{"label": label, "url": url}]
+
 def fetch(url, key, path, method="GET", body=None, prefer=None):
     full = url.rstrip("/") + path
     headers = {"apikey": key, "Authorization": f"Bearer {key}", "Content-Type": "application/json"}
@@ -114,7 +121,7 @@ def main():
         print(f"Destination has {len(existing)} rows; clearing first\u2026")
         fetch(dest_url, dest_key, "/rest/v1/events?id=gt.00000000-0000-0000-0000-000000000000", method="DELETE")
 
-    # 4. strip columns the destination doesn't have (pick) + add source_url
+    # 4. strip columns the destination doesn't have (pick) + build links array
     rows = []
     for e in public:
         rows.append({
@@ -131,7 +138,7 @@ def main():
             "notes": e.get("notes"),
             "rsvp": e.get("rsvp"),
             "source": e.get("source"),
-            "source_url": source_url_for(e.get("source")),
+            "links": links_for(e.get("source")),
             "status": e.get("status"),
             "lat": e.get("lat"),
             "lng": e.get("lng"),
@@ -148,11 +155,11 @@ def main():
         print(f"  inserted {inserted}/{len(rows)}")
 
     # 6. summary
-    have_url = sum(1 for r in rows if r["source_url"])
+    have_links = sum(1 for r in rows if r["links"])
     have_coords = sum(1 for r in rows if r["lat"] is not None)
     print(f"\nDone. {len(rows)} events written.")
-    print(f"  with source_url: {have_url}  without: {len(rows) - have_url}")
-    print(f"  with coords:     {have_coords}  without: {len(rows) - have_coords}")
+    print(f"  with links:  {have_links}  without: {len(rows) - have_links}")
+    print(f"  with coords: {have_coords}  without: {len(rows) - have_coords}")
 
 if __name__ == "__main__":
     main()
