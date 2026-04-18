@@ -1,5 +1,25 @@
 import type { EventRow } from './types';
 
+export function shortSource(source: string | null): string | null {
+  if (!source) return null;
+  // "Galerie / Novità / Designboom / Wallpaper" → "Galerie"
+  // "Dezeen / Domus" → "Dezeen"
+  // "P:S" → "P:S"
+  // "The Future Perfect guide" → "The Future Perfect"
+  const first = source.split(/\s*[/·]\s*/)[0].trim();
+  return first.replace(/\s+(guide|newsletter)$/i, '') || null;
+}
+
+export function matchesQuery(e: EventRow, q: string): boolean {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  const hay = [e.title, e.host, e.venue, e.address, e.notes, e.phase, e.source]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return hay.includes(needle);
+}
+
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 

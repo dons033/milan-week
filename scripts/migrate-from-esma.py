@@ -37,13 +37,24 @@ PRIVATE_SIGNALS = [
     r"personal\s+invite",
     r"private\s+invite",
     r"rsvp@tcpr\.co",
+    r"confirmed\s*\u2713",          # "CONFIRMED ✓" — Esma personal confirmation marker
+    r"\u2605\s*confirmed",           # "★ CONFIRMED" in titles
+    r"\bcocktail reception\b",       # invite-only cocktails
+    r"\blate[\- ]night\s+dance\s+party\b",
 ]
 PRIVATE_SOURCES = {"Invite", "Invite (screenshot)"}
 
 def is_public(e):
     source = (e.get("source") or "").strip()
     if source in PRIVATE_SOURCES: return False
-    blob = " ".join([(e.get("rsvp") or "").lower(), (e.get("notes") or "").lower(), (e.get("title") or "").lower()])
+    # status=CONFIRMED in the source xlsx marked events Esma personally received
+    # invites to; those are not public listings even if the underlying event is.
+    if (e.get("status") or "").upper() == "CONFIRMED": return False
+    blob = " ".join([
+        (e.get("rsvp") or "").lower(),
+        (e.get("notes") or "").lower(),
+        (e.get("title") or "").lower(),
+    ])
     for pat in PRIVATE_SIGNALS:
         if re.search(pat, blob): return False
     return bool(source)

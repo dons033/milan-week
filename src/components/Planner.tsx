@@ -11,6 +11,8 @@ import {
   expandEventDays,
   mapsUrl,
   directionsUrl,
+  shortSource,
+  matchesQuery,
 } from '@/lib/format';
 import { loadPicks, setPick as persistPick } from '@/lib/picks';
 
@@ -40,6 +42,7 @@ export default function Planner({ initialEvents }: Props) {
   const [picks, setPicks] = useState<Record<string, Pick>>({});
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const [pickFilter, setPickFilter] = useState<'all' | 'going' | 'maybe' | 'multiday'>('all');
+  const [query, setQuery] = useState('');
   const didScroll = useRef(false);
 
   useEffect(() => {
@@ -110,6 +113,24 @@ export default function Planner({ initialEvents }: Props) {
       </header>
 
       <nav className="sticky top-0 bg-stone-50/90 backdrop-blur py-2 -mx-6 px-6 z-10 border-b border-stone-200 mb-8 space-y-1.5">
+        <div className="flex items-center gap-2">
+          <input
+            type="search"
+            placeholder="Search title, host, venue…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full text-sm bg-white border border-stone-300 rounded px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-stone-400 placeholder:text-stone-400"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              className="text-xs text-stone-500 hover:text-stone-900"
+              title="Clear search"
+            >
+              clear
+            </button>
+          )}
+        </div>
         <div className="flex flex-wrap gap-1.5 items-center">
           <button
             onClick={() => setActiveDay(null)}
@@ -159,6 +180,7 @@ export default function Planner({ initialEvents }: Props) {
           .filter((g) => !activeDay || g.date === activeDay)
           .map((g) => {
             const items = g.items.filter((e) => {
+              if (!matchesQuery(e, query)) return false;
               if (pickFilter === 'all') return true;
               if (pickFilter === 'multiday') return !!e.ends_on && e.ends_on !== e.starts_on;
               return picks[e.id] === pickFilter;
@@ -215,6 +237,7 @@ function EventCard({
   const map = mapsUrl(e.address);
   const directions = directionsUrl(e.address, { destLat: e.lat, destLng: e.lng });
   const isConfirmed = (e.status || '').toUpperCase().includes('CONFIRMED');
+  const sourceLabel = shortSource(e.source);
 
   return (
     <div className="flex gap-4">
@@ -230,7 +253,9 @@ function EventCard({
       <div className="flex-1 min-w-0">
         <div className="min-w-0">
           <h3 className="font-medium text-stone-900 leading-snug">
-            {e.title}
+            <Link href={`/event/${e.id}`} className="hover:underline decoration-stone-300 underline-offset-2">
+              {e.title}
+            </Link>
             {isConfirmed && (
               <span className="ml-2 inline-block text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 align-middle">
                 Confirmed
@@ -239,6 +264,11 @@ function EventCard({
             {e.phase && (
               <span className="ml-2 inline-block text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-stone-100 text-stone-600 align-middle">
                 {e.phase}
+              </span>
+            )}
+            {sourceLabel && (
+              <span className="ml-2 inline-block text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 align-middle">
+                {sourceLabel}
               </span>
             )}
           </h3>
