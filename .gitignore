@@ -49,3 +49,8 @@ next-env.d.ts
 *.jpg
 !public/**/*.jpg
 !public/**/*.jpeg
+
+# Research scratch dumps (regenerable from DB)
+scripts/_*.csv
+scripts/_*.json
+!scripts/_research-*.json
