@@ -85,6 +85,29 @@ LABEL_FOR = [
     ("ropac.net", "Thaddaeus Ropac"),
     ("milanoartemagazine.it", "Milano Arte"),
     ("artemest.com", "Artemest"),
+    ("cassina.com", "Cassina"),
+    ("thelocalproject.com.au", "The Local Project"),
+    ("hoteldesigns.net", "Hotel Designs"),
+    ("archiproducts.com", "Archiproducts"),
+    ("gallottiradice.it", "Gallotti&Radice"),
+    ("ledesigndefile.com", "Le Design D\u00e9fil\u00e9"),
+    ("frenchliving-inmotion.com", "French Living"),
+    ("giorgettimeda.com", "Giorgetti"),
+    ("rimadesio.it", "Rimadesio"),
+    ("design-milk.com", "Design Milk"),
+    ("t-o-o-g-o-o-d.com", "Toogood"),
+    ("tacchini.it", "Tacchini"),
+    ("usm.com", "USM"),
+    ("acdf.uz", "ACDF"),
+    ("yves-salomon.com", "Yves Salomon"),
+    ("designerspace.it", "Designerspace"),
+    ("lodes.com", "Lodes"),
+    ("marimekko.com", "Marimekko"),
+    ("designwanted.com", "Design Wanted"),
+    ("colourhive.com", "Colourhive"),
+    ("ied.edu", "IED"),
+    ("6am.glass", "6:AM"),
+    ("airmail.news", "Air Mail"),
 ]
 
 def label_for(url: str) -> str:
@@ -123,11 +146,17 @@ def req(env, method, path, body=None, anon=False):
         return json.loads(resp.read().decode("utf-8") or "null")
 
 def merge_links(existing, incoming_urls):
-    """Replace same-host existing entries with incoming URLs, then append remaining incoming. Cap at 3."""
-    incoming_hosts = {host_of(u) for u in incoming_urls}
-    new = [{"label": label_for(u), "url": u} for u in incoming_urls]
+    """Replace same-host existing entries with incoming URLs, then append remaining incoming. Cap at 3.
+    Within incoming_urls, dedupe by host (keep first occurrence — research-supplied order is "most specific first")."""
+    seen_hosts = set()
+    new = []
+    for u in incoming_urls:
+        h = host_of(u)
+        if h in seen_hosts: continue
+        seen_hosts.add(h)
+        new.append({"label": label_for(u), "url": u})
     for link in existing:
-        if host_of(link.get("url") or "") not in incoming_hosts:
+        if host_of(link.get("url") or "") not in seen_hosts:
             new.append(link)
     return new[:3]
 
