@@ -601,80 +601,6 @@ function SheetButton({
   );
 }
 
-function PickButton({ pick, onSet }: { pick: Pick | null; onSet: (p: Pick | null) => void }) {
-  const [open, setOpen] = useState(false);
-
-  function quick(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (pick === 'going') onSet(null);
-    else onSet('going');
-  }
-
-  function showMenu(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setOpen(true);
-  }
-
-  const display = {
-    going: { icon: '\u2605', color: 'text-emerald-600' },
-    skip: { icon: '\u2715', color: 'text-stone-400' },
-    none: { icon: '\u2606', color: 'text-stone-300 hover:text-stone-500' },
-  };
-  const d = display[pick ?? 'none'];
-
-  return (
-    <div className="relative shrink-0">
-      <button
-        onClick={quick}
-        onContextMenu={showMenu}
-        aria-label={pick ? `Pick: ${pick}` : 'Mark as going'}
-        title={pick ? `Picked ${pick}. Tap to clear, right-click for options.` : 'Tap to mark as going'}
-        className={`w-10 h-10 grid place-items-center rounded-full text-2xl leading-none transition ${d.color}`}
-      >
-        {d.icon}
-      </button>
-      <button
-        onClick={showMenu}
-        aria-label="Pick options"
-        className="absolute -bottom-0.5 -right-0.5 w-4 h-4 grid place-items-center rounded-full bg-white border border-stone-300 text-[8px] text-stone-500 leading-none"
-      >
-        ▾
-      </button>
-      {open && (
-        <Sheet onClose={() => setOpen(false)} title="Mark as">
-          <div className="space-y-1">
-            {(['going', 'skip'] as const).map((p) => (
-              <SheetButton
-                key={p}
-                isActive={pick === p}
-                onClick={() => {
-                  onSet(p);
-                  setOpen(false);
-                }}
-              >
-                {p === 'going' && '★ Going'}
-                {p === 'skip' && '✕ Skip'}
-              </SheetButton>
-            ))}
-            {pick && (
-              <SheetButton
-                onClick={() => {
-                  onSet(null);
-                  setOpen(false);
-                }}
-              >
-                Clear
-              </SheetButton>
-            )}
-          </div>
-        </Sheet>
-      )}
-    </div>
-  );
-}
-
 function EventCard({
   e,
   dayIso,
@@ -757,7 +683,6 @@ function EventCard({
                 </span>
               )}
             </h3>
-            <PickButton pick={pick} onSet={onTogglePick} />
           </div>
 
           {(e.venue || e.address) && (
@@ -786,7 +711,35 @@ function EventCard({
             </p>
           )}
 
-          <div className="flex items-center gap-1 mt-2 text-stone-500 -ml-1">
+          <div className="flex flex-wrap gap-1.5 mt-2.5 items-center">
+            {(['going', 'skip'] as const).map((p) => {
+              const active = pick === p;
+              const styles: Record<typeof p, string> = {
+                going: active
+                  ? 'bg-emerald-600 text-white border-emerald-600'
+                  : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50',
+                skip: active
+                  ? 'bg-stone-500 text-white border-stone-500'
+                  : 'border-stone-300 text-stone-500 hover:bg-stone-100',
+              };
+              return (
+                <button
+                  key={p}
+                  onClick={(ev) => {
+                    ev.stopPropagation();
+                    onTogglePick(active ? null : p);
+                  }}
+                  aria-label={active ? `Clear ${p}` : `Mark as ${p}`}
+                  title={active ? `Click to clear (currently ${p})` : `Mark as ${p}`}
+                  className={`text-[10px] uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition ${styles[p]}`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center gap-1 mt-1 text-stone-500 -ml-1">
             {directions && (
               <a
                 href={directions}
