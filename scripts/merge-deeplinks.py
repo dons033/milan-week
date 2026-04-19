@@ -68,6 +68,23 @@ LABEL_FOR = [
     ("calicowallpaper.com", "Calico"),
     ("nuvomagazine.com", "Nuvo"),
     ("5vie.it", "5VIE"),
+    ("artribune.com", "Artribune"),
+    ("dimoregallery.com", "Dimoregallery"),
+    ("glasitalia.com", "Glas Italia"),
+    ("interiordaily.com", "Interior Daily"),
+    ("janusetcie.com", "Janus et Cie"),
+    ("poliform.it", "Poliform"),
+    ("ilsole24ore.com", "Il Sole 24 Ore"),
+    ("internimagazine.com", "Interni"),
+    ("breradesignweek.it", "Brera Design Week"),
+    ("miele.com", "Miele"),
+    ("molteni.it", "Molteni"),
+    ("yesmilano.it", "YesMilano"),
+    ("samsung.com", "Samsung"),
+    ("rossanaorlandi.com", "Rossana Orlandi"),
+    ("ropac.net", "Thaddaeus Ropac"),
+    ("milanoartemagazine.it", "Milano Arte"),
+    ("artemest.com", "Artemest"),
 ]
 
 def label_for(url: str) -> str:
