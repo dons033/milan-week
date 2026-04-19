@@ -10,6 +10,8 @@ import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import type { EventRow, Pick } from '@/lib/types';
 import { formatDayHeading, eventTimeLabel, directionsUrl, formatDateShort, expandEventDays } from '@/lib/format';
 import { loadPicks } from '@/lib/picks';
+import { loadPrefs, type Home } from '@/lib/prefs';
+import { loadLocalEvents } from '@/lib/localEvents';
 import 'leaflet/dist/leaflet.css';
 
 // Milan city centre (Duomo), used as the default map center.
@@ -41,6 +43,13 @@ const meIcon = L.divIcon({
   className: '',
   iconSize: [18, 18],
   iconAnchor: [9, 9],
+});
+
+const homeIcon = L.divIcon({
+  html: `<div style="background:#0f172a;color:#fff;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 4px rgba(0,0,0,0.3);border:2px solid #fff;">\u2302</div>`,
+  className: '',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
 });
 
 function iconFor(e: EventRow, pick: Pick | null) {
@@ -176,26 +185,32 @@ export default function EventsMapInner({ events }: { events: EventRow[] }) {
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const [goingOnly, setGoingOnly] = useState(false);
   const [picks, setPicks] = useState<Record<string, Pick>>({});
+  const [localEvents, setLocalEvents] = useState<EventRow[]>([]);
+  const [home, setHome] = useState<Home | null>(null);
 
   useEffect(() => {
     setPicks(loadPicks());
+    setLocalEvents(loadLocalEvents());
+    setHome(loadPrefs().home);
   }, []);
+
+  const allEvents = useMemo(() => [...events, ...localEvents], [events, localEvents]);
 
   const days = useMemo(() => {
     const set = new Set<string>();
-    for (const e of events) {
+    for (const e of allEvents) {
       for (const d of expandEventDays(e.starts_on, e.ends_on)) set.add(d);
     }
     return Array.from(set).sort();
-  }, [events]);
+  }, [allEvents]);
 
   const filtered = useMemo(() => {
-    return events.filter((e) => {
+    return allEvents.filter((e) => {
       if (goingOnly && picks[e.id] !== 'going') return false;
       if (activeDay && !dayInRange(activeDay, e)) return false;
       return true;
     });
-  }, [events, activeDay, goingOnly, picks]);
+  }, [allEvents, activeDay, goingOnly, picks]);
 
   return (
     <div className="relative h-full w-full">
@@ -210,6 +225,15 @@ export default function EventsMapInner({ events }: { events: EventRow[] }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <LocateControl onLocated={(lat, lng) => setMe({ lat, lng })} />
+        {home && home.lat != null && home.lng != null && (
+          <Marker position={[home.lat, home.lng]} icon={homeIcon}>
+            <Popup>
+              <strong>{home.label}</strong>
+              <br />
+              {home.address}
+            </Popup>
+          </Marker>
+        )}
         {me && (
           <Marker position={[me.lat, me.lng]} icon={meIcon}>
             <Popup>You are here</Popup>

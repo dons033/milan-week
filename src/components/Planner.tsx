@@ -17,6 +17,14 @@ import {
 } from '@/lib/format';
 import { loadPicks, setPick as persistPick } from '@/lib/picks';
 import { buildIcs, downloadIcs, slug } from '@/lib/ics';
+import { loadPrefs, type Home } from '@/lib/prefs';
+import {
+  loadLocalEvents,
+  deleteLocalEvent,
+  isLocal,
+} from '@/lib/localEvents';
+import LocalEventForm from './LocalEventForm';
+import SettingsSheet from './SettingsSheet';
 
 type Props = { initialEvents: EventRow[] };
 
@@ -82,20 +90,36 @@ const MORE_FILTERS: { key: PickFilter; label: string }[] = [
 
 export default function Planner({ initialEvents }: Props) {
   const [picks, setPicks] = useState<Record<string, Pick>>({});
+  const [localEvents, setLocalEvents] = useState<EventRow[]>([]);
+  const [home, setHomeState] = useState<Home | null>(null);
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const [pickFilter, setPickFilter] = useState<PickFilter>('all');
   const [query, setQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const didScroll = useRef(false);
   const dayStripRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPicks(loadPicks());
+    setLocalEvents(loadLocalEvents());
+    setHomeState(loadPrefs().home);
   }, []);
 
-  const groups = useMemo(() => groupByDay(initialEvents), [initialEvents]);
+  function refreshLocalEvents() {
+    setLocalEvents(loadLocalEvents());
+  }
+
+  const allEvents = useMemo(
+    () => [...initialEvents, ...localEvents],
+    [initialEvents, localEvents],
+  );
+
+  const groups = useMemo(() => groupByDay(allEvents), [allEvents]);
   const goingCount = useMemo(
     () => Object.values(picks).filter((p) => p === 'going').length,
     [picks],
@@ -300,13 +324,38 @@ export default function Planner({ initialEvents }: Props) {
                 <ul className="space-y-1">
                   {items.map((e) => {
                     const pick = picks[e.id] || null;
+                    if (editingId === e.id) {
+                      return (
+                        <li key={`${g.date}-${e.id}`} className="border border-stone-300 rounded-xl p-3 -mx-3 my-2 bg-white">
+                          <LocalEventForm
+                            initial={e}
+                            onSaved={() => {
+                              refreshLocalEvents();
+                              setEditingId(null);
+                            }}
+                            onCancel={() => setEditingId(null)}
+                          />
+                        </li>
+                      );
+                    }
                     return (
                       <EventCard
                         key={`${g.date}-${e.id}`}
                         e={e}
                         dayIso={g.date}
                         pick={pick}
+                        home={home}
                         onTogglePick={(p) => setPickFor(e.id, p)}
+                        onEdit={isLocal(e) ? () => setEditingId(e.id) : undefined}
+                        onDelete={
+                          isLocal(e)
+                            ? () => {
+                                if (!confirm('Delete this event from your browser?')) return;
+                                deleteLocalEvent(e.id);
+                                refreshLocalEvents();
+                              }
+                            : undefined
+                        }
                       />
                     );
                   })}
@@ -347,6 +396,22 @@ export default function Planner({ initialEvents }: Props) {
             >
               Search
             </SheetButton>
+            <SheetButton
+              onClick={() => {
+                setMenuOpen(false);
+                setCreating(true);
+              }}
+            >
+              + Add your own event
+            </SheetButton>
+            <SheetButton
+              onClick={() => {
+                setMenuOpen(false);
+                setSettingsOpen(true);
+              }}
+            >
+              Settings
+            </SheetButton>
             {goingCount > 0 && (
               <SheetButton
                 onClick={() => {
@@ -359,6 +424,42 @@ export default function Planner({ initialEvents }: Props) {
             )}
           </div>
         </Sheet>
+      )}
+
+      {/* Add your own event */}
+      {creating && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex items-end sm:items-center justify-center"
+          onClick={() => setCreating(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-5 sm:m-5 shadow-xl max-h-[90vh] overflow-y-auto"
+          >
+            <h2 className="text-lg font-semibold tracking-tight mb-1">Add your own event</h2>
+            <p className="text-xs text-stone-500 mb-4">
+              Saved in this browser only. Export as JSON from Settings to back up.
+            </p>
+            <LocalEventForm
+              onSaved={() => {
+                refreshLocalEvents();
+                setCreating(false);
+              }}
+              onCancel={() => setCreating(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Settings */}
+      {settingsOpen && (
+        <SettingsSheet
+          initialHome={home}
+          localEventCount={localEvents.length}
+          onHomeChange={setHomeState}
+          onLocalEventsChange={refreshLocalEvents}
+          onClose={() => setSettingsOpen(false)}
+        />
       )}
 
       {/* More filters */}
@@ -581,19 +682,37 @@ function EventCard({
   e,
   dayIso,
   pick,
+  home,
   onTogglePick,
+  onEdit,
+  onDelete,
 }: {
   e: EventRow;
   dayIso: string;
   pick: Pick | null;
+  home: Home | null;
   onTogglePick: (p: Pick | null) => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }) {
   const time = eventTimeLabel(e);
   const multiDay = e.ends_on && e.ends_on !== e.starts_on;
   const map = mapsUrl(e.address);
   const directions = directionsUrl(e.address, { destLat: e.lat, destLng: e.lng });
+  const directionsFromHome =
+    home && (e.address || (e.lat != null && e.lng != null))
+      ? directionsUrl(e.address, {
+          destLat: e.lat,
+          destLng: e.lng,
+          origin:
+            home.lat != null && home.lng != null
+              ? `${home.lat},${home.lng}`
+              : home.address,
+        })
+      : null;
   const dotColor = phaseColor(e.phase);
   const firstLink = e.links?.[0];
+  const mine = isLocal(e);
 
   const isFaded = pick === 'skip';
 
@@ -625,12 +744,21 @@ function EventCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <h3 className="font-medium text-stone-900 leading-snug text-[15px]">
-              <Link
-                href={`/event/${e.id}`}
-                className="hover:underline decoration-stone-300 underline-offset-2"
-              >
-                {e.title}
-              </Link>
+              {mine ? (
+                <span>{e.title}</span>
+              ) : (
+                <Link
+                  href={`/event/${e.id}`}
+                  className="hover:underline decoration-stone-300 underline-offset-2"
+                >
+                  {e.title}
+                </Link>
+              )}
+              {mine && (
+                <span className="ml-2 inline-block text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-sky-100 text-sky-800 align-middle">
+                  mine
+                </span>
+              )}
             </h3>
             <PickButton pick={pick} onSet={onTogglePick} />
           </div>
@@ -686,6 +814,19 @@ function EventCard({
             >
               +
             </button>
+            {directionsFromHome && (
+              <a
+                href={directionsFromHome}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(ev) => ev.stopPropagation()}
+                aria-label={`Directions from ${home?.label || 'home'}`}
+                title={`Directions from ${home?.label || 'home'}`}
+                className="text-[12px] text-stone-500 hover:text-stone-900 px-2 h-9 grid place-items-center rounded-full hover:bg-stone-200/60"
+              >
+                from ⌂
+              </a>
+            )}
             {firstLink && (
               <a
                 href={firstLink.url}
@@ -698,12 +839,39 @@ function EventCard({
                 {firstLink.label}
               </a>
             )}
-            <Link
-              href={`/event/${e.id}`}
-              className="ml-auto text-[12px] text-stone-400 hover:text-stone-700 px-2"
-            >
-              More \u2192
-            </Link>
+            {mine ? (
+              <span className="ml-auto flex items-center gap-2">
+                {onEdit && (
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      onEdit();
+                    }}
+                    className="text-[12px] text-stone-500 hover:text-stone-900 px-2"
+                  >
+                    Edit
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={(ev) => {
+                      ev.stopPropagation();
+                      onDelete();
+                    }}
+                    className="text-[12px] text-stone-400 hover:text-red-600 px-2"
+                  >
+                    Delete
+                  </button>
+                )}
+              </span>
+            ) : (
+              <Link
+                href={`/event/${e.id}`}
+                className="ml-auto text-[12px] text-stone-400 hover:text-stone-700 px-2"
+              >
+                More →
+              </Link>
+            )}
           </div>
         </div>
       </div>
