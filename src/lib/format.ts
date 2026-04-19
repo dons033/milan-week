@@ -1,5 +1,17 @@
 import type { EventRow } from './types';
 
+// Subtle dot colour per phase, used as a visual cue on the event card's time column.
+export const PHASE_COLOR: Record<string, string> = {
+  'Pre-Fair':     '#94a3b8',  // slate
+  'Fuorisalone':  '#d97706',  // amber
+  'Alcova':       '#0d9488',  // teal
+  'At Fair (Rho)': '#2563eb', // blue
+};
+
+export function phaseColor(phase: string | null): string {
+  return (phase && PHASE_COLOR[phase]) || '#cbd5e1';
+}
+
 export function shortSource(source: string | null): string | null {
   if (!source) return null;
   // "Galerie / Novità / Designboom / Wallpaper" → "Galerie"
