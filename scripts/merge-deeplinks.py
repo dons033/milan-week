@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 ROOT = Path(__file__).resolve().parent.parent
-RESEARCH = ROOT / "scripts" / "_research-fuorisalone-deeplinks.json"
+RESEARCH = ROOT / "scripts" / (sys.argv[1] if len(sys.argv) > 1 else "_research-fuorisalone-deeplinks.json")
 
 LABEL_FOR = [
     ("wallpaper.com", "Wallpaper"),
@@ -33,16 +33,55 @@ LABEL_FOR = [
     ("novitapr.com", "Novit\u00e0"),
     ("poltronafrau.com", "Poltrona Frau"),
     ("prada.com", "Prada"),
+    ("kohler.com", "Kohler"),
+    ("buccellati.com", "Buccellati"),
+    ("duravit.it", "Duravit"),
+    ("duravit.com", "Duravit"),
+    ("brokis.com", "Brokis"),
+    ("cc-tapis.com", "cc-tapis"),
+    ("apartamentomagazine.com", "Apartamento"),
+    ("mullervanseveren.be", "Muller Van Severen"),
+    ("10corsocomo.com", "10 Corso Como"),
+    ("vanityinmilan.com", "Vanity in Milan"),
+    ("pinupmagazine.org", "Pin-Up"),
+    ("bathroom-review.co.uk", "Bathroom Review"),
+    ("d5mag.com", "D5 Mag"),
+    ("aesop.com", "Aesop"),
+    ("livingetc.com", "Livingetc"),
+    ("monocle.com", "Monocle"),
+    ("archdaily.com", "ArchDaily"),
+    ("interiordaily.com", "Interior Daily"),
+    ("ilgiornaledellarte.com", "Il Giornale dell'Arte"),
+    ("artribune.com", "Artribune"),
+    ("designerspace.it", "Designerspace"),
+    ("triennale.org", "Triennale"),
+    ("nilufar.com", "Nilufar"),
+    ("pirellihangarbicocca.org", "Pirelli HangarBicocca"),
+    ("gallerialuisadellepiane.it", "Galleria Delle Piane"),
+    ("visualatelier8.com", "Visual Atelier 8"),
+    ("hypebeast.com", "Hypebeast"),
+    ("artribune.com", "Artribune"),
+    ("ansa.it", "Ansa"),
+    ("e-flux.com", "e-flux"),
+    ("adidesignmuseum.org", "ADI Museum"),
+    ("internimagazine.it", "Interni"),
+    ("calicowallpaper.com", "Calico"),
+    ("nuvomagazine.com", "Nuvo"),
+    ("5vie.it", "5VIE"),
 ]
 
 def label_for(url: str) -> str:
     host = urllib.parse.urlparse(url).netloc.lower()
+    if host.startswith("www."): host = host[4:]
+    # exact host or proper-suffix match (so calicowallpaper.com !~ wallpaper.com)
     for needle, label in LABEL_FOR:
-        if needle in host: return label
+        if host == needle or host.endswith("." + needle):
+            return label
     return "Source"
 
 def host_of(url: str) -> str:
-    return urllib.parse.urlparse(url).netloc.lower().lstrip("www.")
+    h = urllib.parse.urlparse(url).netloc.lower()
+    return h[4:] if h.startswith("www.") else h
 
 def norm_title(t: str) -> str:
     t = t.lower().replace("\u2014", "-").replace("\u2013", "-")
