@@ -28,21 +28,30 @@ export default function AboutPage() {
           <h2 className="text-lg font-semibold tracking-tight text-stone-900 pt-4">How to use it</h2>
           <ul className="list-disc pl-5 space-y-1">
             <li>
-              Tap <strong>going</strong>, <strong>maybe</strong> or <strong>skip</strong> on any event. Picks live only in your browser — no
-              account, no login, no server-side tracking.
+              Tap the <strong>☆</strong> on any event to mark it <strong>going</strong>; long-press
+              or tap the small menu for <strong>maybe</strong> or <strong>skip</strong>. Picks live
+              only in your browser — no account, no login, no server-side tracking.
             </li>
             <li>
-              Use the search box or the day chips to narrow the list. The <strong>Multiday</strong> filter
-              shows events that run across more than one day (Alcova, Salone itself, district programmes).
+              Use the search box or the day chips to narrow the list. The <strong>Now</strong> and{' '}
+              <strong>Today</strong> filters show what&rsquo;s open right now or still open later
+              today; <strong>Multi-day</strong> surfaces events that run across several days.
             </li>
             <li>
               On the <Link href="/map" className="underline decoration-stone-300 underline-offset-2">Map</Link>, tap
               <em> Locate me</em> to drop a pin where you are, or filter by day to see only one day&rsquo;s pins at a time.
             </li>
             <li>
-              Hit <em>+ Add to calendar</em> on any event card to download a .ics file, or the{' '}
-              <em>⬇ My picks</em> button in the header to export everything you&rsquo;ve marked <em>going</em> at once.
-              Import into Apple Calendar or Google Calendar to get reminders on your phone.
+              Hit <em>+ Add to calendar</em> on any event card to download a single .ics file, or
+              the floating <em>⬇ to calendar</em> button to export everything you&rsquo;ve marked{' '}
+              <em>going</em> at once. Import into Apple Calendar or Google Calendar to get reminders
+              on your phone.
+            </li>
+            <li>
+              Open <strong>Settings</strong> from the <strong>⋯</strong> menu to set a{' '}
+              <strong>home base</strong> (unlocks a &ldquo;from ⌂&rdquo; directions link on every event
+              and a pin on the map), <strong>add your own events</strong> alongside the public list, or
+              export / import your data as JSON. Everything under Settings stays in your browser.
             </li>
           </ul>
 
@@ -65,10 +74,19 @@ export default function AboutPage() {
             <li>Pins are geocoded from OpenStreetMap data, which occasionally lands a block off. Trust the venue name over the pin.</li>
           </ul>
 
+          <h2 className="text-lg font-semibold tracking-tight text-stone-900 pt-4">Who made this</h2>
+          <p>
+            Built by <strong>Don Seibert</strong> — by day an insurtech builder, by evening
+            occasionally a maker of small tools. This one started as a weekend project for his wife
+            Esma, who was heading to Milan for Design Week 2026 and wanted a calmer way to keep
+            track of everything that was on. It worked well enough that it seemed worth opening up.
+            No account, no tracking, no monetisation — just the planner.
+          </p>
+
           <h2 className="text-lg font-semibold tracking-tight text-stone-900 pt-4">Colophon</h2>
           <p>
             Built on Next.js + Supabase, maps by Leaflet and OpenStreetMap. Favicon is a stylised
-            Franco Albini & Franca Helg Metro handrail — Milan&rsquo;s other enduring design classic.
+            Franco Albini &amp; Franca Helg Metro handrail — Milan&rsquo;s other enduring design classic.
             Not affiliated with Salone del Mobile, Fuorisalone or any of the cited sources.
           </p>
         </section>

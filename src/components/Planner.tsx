@@ -173,7 +173,7 @@ export default function Planner({ initialEvents }: Props) {
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-5 pb-24">
+    <main className="max-w-3xl w-full min-w-0 mx-auto px-5 pb-24">
       {/* Header — minimal */}
       <header className="flex items-center justify-between gap-4 pt-7 pb-5">
         <Link href="/" className="text-2xl font-semibold tracking-tight text-stone-900">
@@ -277,7 +277,7 @@ export default function Planner({ initialEvents }: Props) {
             onClick={() => setFiltersOpen(true)}
             className="text-xs text-stone-500 hover:text-stone-900 px-2 py-1.5 whitespace-nowrap"
           >
-            More \u25be
+            More ▾
           </button>
         </div>
       </div>
@@ -376,7 +376,7 @@ export default function Planner({ initialEvents }: Props) {
           className="fixed bottom-5 right-5 z-30 bg-emerald-600 text-white rounded-full pl-4 pr-5 py-3 text-sm font-medium shadow-lg hover:bg-emerald-700 active:scale-95 transition flex items-center gap-2"
           aria-label="Download going events as .ics"
         >
-          <span className="text-base">\u2b07</span>
+          <span className="text-base">⬇</span>
           <span>{goingCount}</span>
           <span className="text-emerald-100 hidden sm:inline">to calendar</span>
         </button>
@@ -642,7 +642,7 @@ function PickButton({ pick, onSet }: { pick: Pick | null; onSet: (p: Pick | null
         aria-label="Pick options"
         className="absolute -bottom-0.5 -right-0.5 w-4 h-4 grid place-items-center rounded-full bg-white border border-stone-300 text-[8px] text-stone-500 leading-none"
       >
-        \u25be
+        ▾
       </button>
       {open && (
         <Sheet onClose={() => setOpen(false)} title="Mark as">
@@ -730,7 +730,7 @@ function EventCard({
           </div>
           {multiDay && dayIso === e.starts_on && (
             <div className="text-[9px] uppercase tracking-wider text-stone-400 mt-0.5">
-              \u2192 {formatDateShort(e.ends_on!)}
+              → {formatDateShort(e.ends_on!)}
             </div>
           )}
           <div
@@ -743,7 +743,7 @@ function EventCard({
         {/* Body */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-medium text-stone-900 leading-snug text-[15px]">
+            <h3 className="flex-1 min-w-0 font-medium text-stone-900 leading-snug text-[15px] break-words">
               {mine ? (
                 <span>{e.title}</span>
               ) : (
@@ -764,16 +764,16 @@ function EventCard({
           </div>
 
           {(e.venue || e.address) && (
-            <p className="text-[13px] text-stone-600 mt-0.5">
+            <p className="text-[13px] text-stone-600 mt-0.5 break-words">
               {e.venue}
-              {e.venue && e.address && <span className="text-stone-400"> \u00b7 </span>}
+              {e.venue && e.address && <span className="text-stone-400"> · </span>}
               {map ? (
                 <a
                   href={map}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(ev) => ev.stopPropagation()}
-                  className="underline decoration-stone-300 underline-offset-2 hover:decoration-stone-700"
+                  className="underline decoration-stone-300 underline-offset-2 hover:decoration-stone-700 break-words"
                 >
                   {e.address}
                 </a>
@@ -784,7 +784,7 @@ function EventCard({
           )}
 
           {e.notes && (
-            <p className="text-[13px] text-stone-500 mt-1 line-clamp-2 leading-relaxed">
+            <p className="text-[13px] text-stone-500 mt-1 leading-relaxed break-words">
               {e.notes}
             </p>
           )}
@@ -800,7 +800,7 @@ function EventCard({
                 title="Directions"
                 className="w-9 h-9 grid place-items-center rounded-full hover:bg-stone-200/60 active:bg-stone-200 text-base"
               >
-                \u2197
+                ↗
               </a>
             )}
             <button
