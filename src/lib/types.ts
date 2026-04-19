@@ -1,4 +1,4 @@
-export type Pick = 'going' | 'maybe' | 'skip';
+export type Pick = 'going' | 'skip';
 
 export type EventLink = { label: string; url: string };
 

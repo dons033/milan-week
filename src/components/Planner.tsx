@@ -28,7 +28,7 @@ import SettingsSheet from './SettingsSheet';
 
 type Props = { initialEvents: EventRow[] };
 
-type PickFilter = 'all' | 'going' | 'maybe' | 'multiday' | 'today' | 'now';
+type PickFilter = 'all' | 'going' | 'multiday' | 'today' | 'now';
 
 function passesPickFilter(
   e: EventRow,
@@ -84,7 +84,6 @@ const PRIMARY_FILTERS: { key: PickFilter; label: string }[] = [
   { key: 'going', label: 'Going' },
 ];
 const MORE_FILTERS: { key: PickFilter; label: string }[] = [
-  { key: 'maybe', label: 'Maybe' },
   { key: 'multiday', label: 'Multi-day' },
 ];
 
@@ -620,7 +619,6 @@ function PickButton({ pick, onSet }: { pick: Pick | null; onSet: (p: Pick | null
 
   const display = {
     going: { icon: '\u2605', color: 'text-emerald-600' },
-    maybe: { icon: '\u25D0', color: 'text-amber-500' },
     skip: { icon: '\u2715', color: 'text-stone-400' },
     none: { icon: '\u2606', color: 'text-stone-300 hover:text-stone-500' },
   };
@@ -647,7 +645,7 @@ function PickButton({ pick, onSet }: { pick: Pick | null; onSet: (p: Pick | null
       {open && (
         <Sheet onClose={() => setOpen(false)} title="Mark as">
           <div className="space-y-1">
-            {(['going', 'maybe', 'skip'] as const).map((p) => (
+            {(['going', 'skip'] as const).map((p) => (
               <SheetButton
                 key={p}
                 isActive={pick === p}
@@ -656,9 +654,8 @@ function PickButton({ pick, onSet }: { pick: Pick | null; onSet: (p: Pick | null
                   setOpen(false);
                 }}
               >
-                {p === 'going' && '\u2605 Going'}
-                {p === 'maybe' && '\u25D0 Maybe'}
-                {p === 'skip' && '\u2715 Skip'}
+                {p === 'going' && '★ Going'}
+                {p === 'skip' && '✕ Skip'}
               </SheetButton>
             ))}
             {pick && (

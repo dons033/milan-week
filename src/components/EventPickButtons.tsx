@@ -19,15 +19,12 @@ export default function EventPickButtons({ eventId }: { eventId: string }) {
 
   return (
     <div className="flex flex-wrap gap-1.5 items-center">
-      {(['going', 'maybe', 'skip'] as const).map((p) => {
+      {(['going', 'skip'] as const).map((p) => {
         const active = pick === p;
         const styles: Record<typeof p, string> = {
           going: active
             ? 'bg-emerald-600 text-white border-emerald-600'
             : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50',
-          maybe: active
-            ? 'bg-amber-500 text-white border-amber-500'
-            : 'border-amber-300 text-amber-700 hover:bg-amber-50',
           skip: active
             ? 'bg-stone-500 text-white border-stone-500'
             : 'border-stone-300 text-stone-500 hover:bg-stone-100',

@@ -8,7 +8,13 @@ type Store = Record<string, Pick>;
 function read(): Store {
   if (typeof window === 'undefined') return {};
   try {
-    return JSON.parse(localStorage.getItem(KEY) || '{}');
+    const raw = JSON.parse(localStorage.getItem(KEY) || '{}') as Record<string, string>;
+    // Migrate: 'maybe' was retired — drop any residual values so the type stays honest.
+    const out: Store = {};
+    for (const [id, v] of Object.entries(raw)) {
+      if (v === 'going' || v === 'skip') out[id] = v;
+    }
+    return out;
   } catch {
     return {};
   }

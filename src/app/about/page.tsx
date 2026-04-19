@@ -28,8 +28,8 @@ export default function AboutPage() {
           <h2 className="text-lg font-semibold tracking-tight text-stone-900 pt-4">How to use it</h2>
           <ul className="list-disc pl-5 space-y-1">
             <li>
-              Tap the <strong>☆</strong> on any event to mark it <strong>going</strong>; long-press
-              or tap the small menu for <strong>maybe</strong> or <strong>skip</strong>. Picks live
+              Tap the <strong>☆</strong> on any event to mark it <strong>going</strong>; tap
+              the small <strong>▾</strong> to <strong>skip</strong> it (fades the card). Picks live
               only in your browser — no account, no login, no server-side tracking.
             </li>
             <li>
